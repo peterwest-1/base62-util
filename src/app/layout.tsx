@@ -3,7 +3,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://peterwest-1.github.io/base62-generator"),
+  metadataBase: new URL("https://peterwest-1.github.io/base62-util"),
   title: {
     default: "Base62 Generator",
     template: "%s · Base62 Generator",
