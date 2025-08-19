@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { generateBase62 } from "@/lib/utils";
-import { Copy, Quote, RefreshCw } from "lucide-react";
+import { Check, Copy, Quote, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ const Base62Generator = () => {
   const [count, setCount] = useState(1);
   const [enableQuotes, setEnableQuotes] = useState(true);
   const [generatedValues, setGeneratedValues] = useState<string[]>([]);
+  const [copiedItems, setCopiedItems] = useState<Set<number>>(new Set());
 
   const handleGenerate = () => {
     const values = [];
@@ -29,12 +30,14 @@ const Base62Generator = () => {
       values.push(prefix + base62Value);
     }
     setGeneratedValues(values);
+    setCopiedItems(new Set());
   };
 
-  const copyToClipboard = async (value: string) => {
+  const copyToClipboard = async (value: string, index: number) => {
     try {
       const textToCopy = enableQuotes ? `"${value}"` : value;
       await navigator.clipboard.writeText(textToCopy);
+      setCopiedItems((prev) => new Set(prev).add(index));
       toast.success("Value copied to clipboard");
     } catch (err) {
       toast.error("Could not copy to clipboard");
@@ -158,12 +161,16 @@ const Base62Generator = () => {
                   >
                     <span className="break-all">{value}</span>
                     <Button
-                      variant="ghost"
+                      variant={copiedItems.has(index) ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => copyToClipboard(value)}
+                      onClick={() => copyToClipboard(value, index)}
                       className="ml-2 flex-shrink-0"
                     >
-                      <Copy className="w-4 h-4" />
+                      {copiedItems.has(index) ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 ))}
