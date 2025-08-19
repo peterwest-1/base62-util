@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { generateBase62 } from "@/lib/utils";
-import { Copy, RefreshCw } from "lucide-react";
+import { Copy, Quote, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ const Base62Generator = () => {
   const [length, setLength] = useState(8);
   const [prefix, setPrefix] = useState("");
   const [count, setCount] = useState(1);
+  const [enableQuotes, setEnableQuotes] = useState(true);
   const [generatedValues, setGeneratedValues] = useState<string[]>([]);
 
   const handleGenerate = () => {
@@ -32,7 +33,8 @@ const Base62Generator = () => {
 
   const copyToClipboard = async (value: string) => {
     try {
-      await navigator.clipboard.writeText(value);
+      const textToCopy = enableQuotes ? `"${value}"` : value;
+      await navigator.clipboard.writeText(textToCopy);
       toast.success("Value copied to clipboard");
     } catch (err) {
       toast.error("Could not copy to clipboard");
@@ -41,7 +43,10 @@ const Base62Generator = () => {
 
   const copyAllToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(generatedValues.join("\n"));
+      const valuesToCopy = enableQuotes
+        ? generatedValues.map((value) => `"${value}"`).join("\n")
+        : generatedValues.join("\n");
+      await navigator.clipboard.writeText(valuesToCopy);
       toast.success("All values copied to clipboard");
     } catch (err) {
       toast.error("Could not copy to clipboard");
@@ -125,10 +130,24 @@ const Base62Generator = () => {
                   {generatedValues.length !== 1 ? "s" : ""} generated
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={copyAllToClipboard}>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy All
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={enableQuotes ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setEnableQuotes(!enableQuotes)}
+                >
+                  <Quote className="w-4 h-4 mr-2" />
+                  Quotes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyAllToClipboard}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy All
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-96 overflow-y-auto">
